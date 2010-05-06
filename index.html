@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript">
+		var mySites = [];
+		mySites['google'] = new Site("Google", 'G', "http://www.google.com/#hl=en&source=hp&q=");
+		mySites['amazon'] = new Site("Amazon", 'Z', "http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=");
+		mySites['wikipedia'] = new Site("Wikipedia", 'W', "http://en.wikipedia.org/wiki/Special:Search?search=");
+		mySites['ycombinator'] = new Site("Y-Combinator", 'P', "http://searchyc.com/");
+		mySites['crunchbase'] = new Site("CrunchBase", 'B', "http://www.crunchbase.com/search?query=");
+		selectedLink = 0;
+
+		$(document).ready(function() {
+
+			$("#gobutton").click(function(e) {
+				e.preventDefault();
+				var query = trim($("#q").val());
+				window.location = validURL(query);
+			});
+
+			var ctrl = 17;
+			$(document).keyup(function (e) {
+				if(e.which == ctrl)
+					isCtrl=false; 
+			}).keydown(function (e) {
+				if(e.which == ctrl)
+					isCtrl=true;
+				for (x in mySites) 
+					mySites[x].checkKeyPress(e, isCtrl);
+			})		
+			
+			$("#q").keydown(function (e) {
+				if(e.which == 39) {
+					e.preventDefault();
+					if(selectedLink != 4) {
+						mySelectedLink = "#link" + selectedLink;
+						$(mySelectedLink).removeClass("selectedLink");
+						$(mySelectedLink).addClass("unselectedLink");
+
+						selectedLink = selectedLink + 1;
+
+						newSelectedLink = "#link" + selectedLink;
+						$(newSelectedLink).removeClass("unselectedLink");
+						$(newSelectedLink).addClass("selectedLink");
+					}
+				}
+				if(e.which == 37) {
+					e.preventDefault();
+					if(selectedLink != 0) {
+						mySelectedLink = "#link" + selectedLink;
+						$(mySelectedLink).removeClass("selectedLink");
+						$(mySelectedLink).addClass("unselectedLink");
+
+						selectedLink = selectedLink - 1;
+
+						newSelectedLink = "#link" + selectedLink;
+						$(newSelectedLink).removeClass("unselectedLink");
+						$(newSelectedLink).addClass("selectedLink");
+					}
+	
+				}
+
+			})
+		});
+
+		function validURL(str) { 
+			var prefix = "http://";
+
+			if (str.substring(0,7) == prefix) {
+				return str;
+			}
+			return prefix + str;
+		}
+
+		function trim(str) { 
+			str = str.replace(/^\s+/g,"");//remove heading whitespace
+			str = str.replace(/\s+$/g,"");//remove trailing whitespace
+			return str;
+		} 
+
+		function urlCheck(str) {
+			var v = new RegExp();
+			v.compile("^[A-Za-z]+://[A-Za-z0-9-_]+\\.[A-Za-z0-9-_%&\?\/.=]+$");
+			if (!v.test(str)) {
+				return false;
+			}
+			return true;
+		} 
+
+		function checkKeyPress(e, isCtrl) {
+			if(isCtrl == true && e.which == this.ctrlKey) {
+				e.preventDefault();
+				this.urlGo();
+			}
+		}
+
+		function urlGo() {
+			var query = trim($("#q").val());
+			window.location = this.searchURL + encodeURIComponent(query).replace("%20", "+");
+		}
+
+		function Site(name, ctrlKey, searchURL) {
+			this.name = name;
+			this.ctrlKey = ctrlKey.charCodeAt(0);
+			this.searchURL = searchURL;
+			this.urlGo = urlGo;
+			this.checkKeyPress = checkKeyPress;
+		}
+	</script>
+	<link rel="stylesheet" href="blueprint/screen.css" type="text/css" media="screen, projection">
+	<link rel="stylesheet" href="blueprint/print.css" type="text/css" media="print">    
+	<!--[if IE]><link rel="stylesheet" href="blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+	<title>Address Bar</title>
+	<style type="text/css">
+		.selectedLink { -moz-border-radius: 10px; -webkit-border-radius: 10px; border: 1px solid #555555; display:inline-block; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; background-color: #dddddd; }
+		.unselectedLink { border: 1px solid #000000; display:inline-block; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; background-color: #000000; }
+
+	</style>
+</head> 
+<body style="background-color: #000000"> 
+	<div class="container">
+		<div class="span-24 last">&nbsp;</div>
+		<div class="span-24 last">&nbsp;</div>
+		<div class="span-24 last">&nbsp;</div>
+		<div class="span-24 last">&nbsp;</div>
+		<div class="span-24 last">&nbsp;</div>
+		<div class="span-24 last">&nbsp;</div>
+		<div class="span-24 last">&nbsp;</div>
+		<div class="span-24 last">&nbsp;</div>
+		<div class="span-24 last">&nbsp;</div>
+		<div class="span-24 last">
+			<form action="." method="GET" name="mainform">
+				<div class="span-24 last">
+					<input type="text" name="q" id="q" value="" class="title" style="width: 100%; font-size: 3.0em"/>
+				</div>
+				<div class="span-24 last">
+					<input id="gobutton" type="submit" value="Go!" style="visibility: hidden;"/>
+				</div>
+			</form>
+			<script type="text/javascript">document.mainform.q.focus()</script>
+		</div>
+		<div class="span-4 prepend-1">
+			<div id="link0" class="selectedLink">
+				<a href="." onClick="mySites['google'].urlGo();return false;"><img src="images/google.png" border="0" title="ctrl G"/></a>
+			</div>
+		</div>
+		<div class="span-4 prepend-1">
+			<div id="link1" class="unselectedLink">
+				<a href="." onClick="mySites['wikipedia'].urlGo();return false;"><img src="images/wikipedia.png" border="0" title="ctrl W"/></a>
+			</div>
+		</div>
+		<div class="span-4 prepend-1">
+			<div id="link2" class="unselectedLink">
+				<a href="." onClick="mySites['ycombinator'].urlGo();return false;"><img src="images/ycombinator.gif" border="0" title="ctrl P"/></a>
+			</div>
+		</div>
+		<div class="span-4 prepend-1">
+			<div id="link3" class="unselectedLink">
+				<a href="." onClick="mySites['amazon'].urlGo();return false;"><img src="images/amazon.png" border="0" title="ctrl Z"/></a>
+			</div>
+		</div>
+		<div class="span-3 prepend-1 last">
+			<div id="link4" class="unselectedLink">
+				<a href="." onClick="mySites['crunchbase'].urlGo();return false;"><img src="images/crunchbase.png" border="0" title="ctrl B"/></a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
