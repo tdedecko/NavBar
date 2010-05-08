@@ -4,65 +4,87 @@
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript">
 		var mySites = [];
-		mySites['google'] = new Site("Google", 'G', "http://www.google.com/#hl=en&source=hp&q=");
-		mySites['amazon'] = new Site("Amazon", 'Z', "http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=");
-		mySites['wikipedia'] = new Site("Wikipedia", 'W', "http://en.wikipedia.org/wiki/Special:Search?search=");
-		mySites['ycombinator'] = new Site("Y-Combinator", 'P', "http://searchyc.com/");
-		mySites['crunchbase'] = new Site("CrunchBase", 'B', "http://www.crunchbase.com/search?query=");
-		selectedLink = 0;
+		mySites[0] = new Site("Google", "http://www.google.com/#hl=en&source=hp&q=", "google.png");
+		mySites[1] = new Site("Amazon", "http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=", "amazon.png");
+		mySites[2] = new Site("Wikipedia", "http://en.wikipedia.org/wiki/Special:Search?search=", "wikipedia.png");
+		mySites[3] = new Site("Y-Combinator", "http://searchyc.com/", "ycombinator.gif");
+		mySites[4] = new Site("CrunchBase", "http://www.crunchbase.com/search?query=", "crunchbase.png");
+		var selectedLink = -1;
 
 		$(document).ready(function() {
+			$("#direction").attr("value", "Go!");
+			
+			$("#direction").click(function(e) {
+				e.preventDefault();
+				document.directionForm.goDirection.click();
+			});
 
 			$("#gobutton").click(function(e) {
 				e.preventDefault();
-				var query = trim($("#q").val());
-				window.location = validURL(query);
+				document.directionForm.direction.focus();
 			});
 
-			var ctrl = 17;
-			$(document).keyup(function (e) {
-				if(e.which == ctrl)
-					isCtrl=false; 
-			}).keydown(function (e) {
-				if(e.which == ctrl)
-					isCtrl=true;
-				for (x in mySites) 
-					mySites[x].checkKeyPress(e, isCtrl);
-			})		
-			
-			$("#q").keydown(function (e) {
+			$("#goDirection").click(function(e) {
+				e.preventDefault();
+				var query = trim($("#q").val());
+				if(selectedLink == -1) {	
+					window.location = validURL(query);
+				} else {
+					window.location = mySites[selectedLink].searchURL + encodeURIComponent(query).replace("%20", "+");
+				}
+			});
+
+			$("#direction").keydown(function (e) {
 				if(e.which == 39) {
 					e.preventDefault();
-					if(selectedLink != 4) {
-						mySelectedLink = "#link" + selectedLink;
-						$(mySelectedLink).removeClass("selectedLink");
-						$(mySelectedLink).addClass("unselectedLink");
-
-						selectedLink = selectedLink + 1;
-
-						newSelectedLink = "#link" + selectedLink;
-						$(newSelectedLink).removeClass("unselectedLink");
-						$(newSelectedLink).addClass("selectedLink");
+					if(selectedLink != mySites.length-1) {
+						selectedLink = changeSelectedLink(selectedLink, selectedLink + 1);
 					}
 				}
 				if(e.which == 37) {
 					e.preventDefault();
-					if(selectedLink != 0) {
-						mySelectedLink = "#link" + selectedLink;
-						$(mySelectedLink).removeClass("selectedLink");
-						$(mySelectedLink).addClass("unselectedLink");
-
-						selectedLink = selectedLink - 1;
-
-						newSelectedLink = "#link" + selectedLink;
-						$(newSelectedLink).removeClass("unselectedLink");
-						$(newSelectedLink).addClass("selectedLink");
+					if(selectedLink != -1) {
+						selectedLink = changeSelectedLink(selectedLink, selectedLink-1);
 					}
-	
 				}
+			});
 
-			})
+			$("#direction").focus(function(e) {
+				$("#direction").attr("value", "");	
+			});
+
+			$("#direction").blur(function(e) {
+				$("#direction").attr("value", "Go!");
+			});
+
+			$("#direction").keyup(function(e) {
+				var directionValue = $("#direction").attr("value");
+				for (var index = mySites.length-1; index >= 0; index--) {
+					if (directionValue.length != 0) {
+						if (mySites[index].simpleName.substring(0,directionValue.length) == directionValue) {
+							$("#mySites" + index + "img").attr("style", ""); 
+							selectedLink = changeSelectedLink(selectedLink, index);
+						} else {
+							$("#mySites" + index + "img").attr("style", "opacity:0.4;filter:alpha(opacity=40)");
+						}
+					} else {
+						$("#mySites" + index + "img").attr("style", "");
+					}
+				}
+			});
 		});
+
+		function changeSelectedLink(currentSelection, newSelection) {
+			mySelectedLink = "#link" + currentSelection;
+			$(mySelectedLink).removeClass("selectedLink");
+			$(mySelectedLink).addClass("unselectedLink");
+			
+			newSelectedLink = "#link" + newSelection;
+			$(newSelectedLink).removeClass("unselectedLink");
+			$(newSelectedLink).addClass("selectedLink");
+			
+			return(newSelection);
+		}
 
 		function validURL(str) { 
 			var prefix = "http://";
@@ -74,7 +96,7 @@
 		}
 
 		function trim(str) { 
-			str = str.replace(/^\s+/g,"");//remove heading whitespace
+			str = str.replace(/^\s+/g,"");//remove leading whitespace
 			str = str.replace(/\s+$/g,"");//remove trailing whitespace
 			return str;
 		} 
@@ -87,12 +109,23 @@
 			}
 			return true;
 		} 
+		
+		//
+		// Site Class Definition
+		//
+		function Site(name, searchURL, imageFile) {
+			this.name = name;
 
-		function checkKeyPress(e, isCtrl) {
-			if(isCtrl == true && e.which == this.ctrlKey) {
-				e.preventDefault();
-				this.urlGo();
-			}
+			// Create Identify name for site. Strips ".,?!-"
+			var lowerName = name.toLowerCase();
+			this.simpleName = lowerName.replace (/[\.\,\?!\-]/g, "");
+
+			this.imageFile = "images/" + imageFile;
+			this.searchURL = searchURL;
+
+			// Function definitions
+			this.urlGo = urlGo;
+			this.setSiteImage = setSiteImage;
 		}
 
 		function urlGo() {
@@ -100,25 +133,23 @@
 			window.location = this.searchURL + encodeURIComponent(query).replace("%20", "+");
 		}
 
-		function Site(name, ctrlKey, searchURL) {
-			this.name = name;
-			this.ctrlKey = ctrlKey.charCodeAt(0);
-			this.searchURL = searchURL;
-			this.urlGo = urlGo;
-			this.checkKeyPress = checkKeyPress;
+		function setSiteImage(index) { 
+			$("#mySites" + index + "img").attr({src: this.imageFile, title: this.name});
 		}
+
+
 	</script>
 	<link rel="stylesheet" href="blueprint/screen.css" type="text/css" media="screen, projection">
 	<link rel="stylesheet" href="blueprint/print.css" type="text/css" media="print">    
 	<!--[if IE]><link rel="stylesheet" href="blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
 	<title>Address Bar</title>
 	<style type="text/css">
-		.selectedLink { -moz-border-radius: 10px; -webkit-border-radius: 10px; border: 1px solid #555555; display:inline-block; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; background-color: #dddddd; }
-		.unselectedLink { border: 1px solid #000000; display:inline-block; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; background-color: #000000; }
-
+		.selectedLink { -moz-border-radius: 10px; -webkit-border-radius: 10px; border: 0px; display:inline-block; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; background-color: #BBBBBB; }
+		.unselectedLink { border: 0px display:inline-block; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;}
+		.directionInput { -moz-border-radius: 10px; -webkit-border-radius: 10px; margin: 0px !important; width: 95% !important; font-size: 2.0em; text-align: center; cursor:pointer;cursor:hand; border: 1px solid #000000 !important;}
 	</style>
 </head> 
-<body style="background-color: #000000"> 
+<body style="background-color: #FFFFFF"> 
 	<div class="container">
 		<div class="span-24 last">&nbsp;</div>
 		<div class="span-24 last">&nbsp;</div>
@@ -132,37 +163,54 @@
 		<div class="span-24 last">
 			<form action="." method="GET" name="mainform">
 				<div class="span-24 last">
-					<input type="text" name="q" id="q" value="" class="title" style="width: 100%; font-size: 3.0em"/>
+					<input type="text" name="q" id="q" value="" class="title" style="width: 100%; font-size: 3.0em; border: 1px solid #000000;"/>
 				</div>
 				<div class="span-24 last">
 					<input id="gobutton" type="submit" value="Go!" style="visibility: hidden;"/>
 				</div>
 			</form>
-			<script type="text/javascript">document.mainform.q.focus()</script>
+			<script type="text/javascript">document.mainform.q.focus();</script>
+			<form action="." method="GET" name="directionForm">
+				<div class="span-24 last">
+					<div id="link-1" class="selectedLink" style="width: 25%;">
+						<input type="text" name="direction" id="direction" value="Go!" class="directionInput text"/>
+					</div>
+				</div>
+				<div class="span-24 last">
+					<input id="goDirection" type="submit" value="Go!" style="visibility: hidden;"/>
+				</div>
+			</form>
 		</div>
-		<div class="span-4 prepend-1">
-			<div id="link0" class="selectedLink">
-				<a href="." onClick="mySites['google'].urlGo();return false;"><img src="images/google.png" border="0" title="ctrl G"/></a>
+		<div class="span-24 last" style="-moz-border-radius: 10px; -webkit-border-radius: 10px; background-color: #FFEFC6; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000000;">
+			<div class="span-4 prepend-1">
+				<div id="link0" class="unselectedLink">
+					<a href="." onClick="mySites[0].urlGo();return false;"><img id="mySites0img" border="0"/></a>
+					<script type="text/javascript">mySites[0].setSiteImage(0);</script>
+				</div>
 			</div>
-		</div>
-		<div class="span-4 prepend-1">
-			<div id="link1" class="unselectedLink">
-				<a href="." onClick="mySites['wikipedia'].urlGo();return false;"><img src="images/wikipedia.png" border="0" title="ctrl W"/></a>
+			<div class="span-4 prepend-1">
+				<div id="link1" class="unselectedLink">
+					<a href="." onClick="mySites[1].urlGo();return false;"><img id="mySites1img" border="0"/></a>
+					<script type="text/javascript">mySites[1].setSiteImage(1);</script>
+				</div>
 			</div>
-		</div>
-		<div class="span-4 prepend-1">
-			<div id="link2" class="unselectedLink">
-				<a href="." onClick="mySites['ycombinator'].urlGo();return false;"><img src="images/ycombinator.gif" border="0" title="ctrl P"/></a>
+			<div class="span-4 prepend-1">
+				<div id="link2" class="unselectedLink">
+					<a href="." onClick="mySites[2].urlGo();return false;"><img id="mySites2img" border="0"/></a>
+					<script type="text/javascript">mySites[2].setSiteImage(2);</script>
+				</div>
 			</div>
-		</div>
-		<div class="span-4 prepend-1">
-			<div id="link3" class="unselectedLink">
-				<a href="." onClick="mySites['amazon'].urlGo();return false;"><img src="images/amazon.png" border="0" title="ctrl Z"/></a>
+			<div class="span-4 prepend-1">
+				<div id="link3" class="unselectedLink">
+					<a href="." onClick="mySites[3].urlGo();return false;"><img id="mySites3img" border="0"/></a>
+					<script type="text/javascript">mySites[3].setSiteImage(3);</script>
+				</div>
 			</div>
-		</div>
-		<div class="span-3 prepend-1 last">
-			<div id="link4" class="unselectedLink">
-				<a href="." onClick="mySites['crunchbase'].urlGo();return false;"><img src="images/crunchbase.png" border="0" title="ctrl B"/></a>
+			<div class="span-3 prepend-1 last">
+				<div id="link4" class="unselectedLink">
+					<a href="." onClick="mySites[4].urlGo();return false;"><img id="mySites4img" border="0"/></a>
+					<script type="text/javascript">mySites[4].setSiteImage(4);</script>
+				</div>
 			</div>
 		</div>
 	</div>
