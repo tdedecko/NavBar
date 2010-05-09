@@ -55,20 +55,26 @@
 
 			$("#direction").blur(function(e) {
 				$("#direction").attr("value", "Go!");
+				selectedLink = changeSelectedLink(selectedLink, -1);
+				for (var index = mySites.length-1; index >= 0; index--) {
+					$("#mySites" + index + "img").attr("style", ""); 
+				}
 			});
 
 			$("#direction").keyup(function(e) {
 				var directionValue = $("#direction").attr("value");
-				for (var index = mySites.length-1; index >= 0; index--) {
-					if (directionValue.length != 0) {
-						if (mySites[index].simpleName.substring(0,directionValue.length) == directionValue) {
-							$("#mySites" + index + "img").attr("style", ""); 
-							selectedLink = changeSelectedLink(selectedLink, index);
+				if (e.which != 37 && e.which != 39) {
+					for (var index = mySites.length-1; index >= 0; index--) {
+						if (directionValue.length != 0) {
+							if (mySites[index].simpleName.substring(0,directionValue.length) == directionValue) {
+								$("#mySites" + index + "img").attr("style", ""); 
+								selectedLink = changeSelectedLink(selectedLink, index);
+							} else {
+								$("#mySites" + index + "img").attr("style", "opacity:0.4;filter:alpha(opacity=40)");
+							}
 						} else {
-							$("#mySites" + index + "img").attr("style", "opacity:0.4;filter:alpha(opacity=40)");
+							$("#mySites" + index + "img").attr("style", "");
 						}
-					} else {
-						$("#mySites" + index + "img").attr("style", "");
 					}
 				}
 			});
@@ -115,13 +121,12 @@
 		//
 		function Site(name, searchURL, imageFile) {
 			this.name = name;
+			this.imageFile = "images/" + imageFile;
+			this.searchURL = searchURL;
 
 			// Create Identify name for site. Strips ".,?!-"
 			var lowerName = name.toLowerCase();
 			this.simpleName = lowerName.replace (/[\.\,\?!\-]/g, "");
-
-			this.imageFile = "images/" + imageFile;
-			this.searchURL = searchURL;
 
 			// Function definitions
 			this.urlGo = urlGo;
