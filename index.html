@@ -151,8 +151,8 @@
 	<title>Address Bar</title>
 	<style type="text/css">
 		.selectedLink { -moz-border-radius: 10px; -webkit-border-radius: 10px; border: 0px; display:inline-block; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; background-color: #BBBBBB; }
-		.unselectedLink { border: 0px display:inline-block; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;}
-		.directionInput { -moz-border-radius: 10px; -webkit-border-radius: 10px; margin: 0px !important; width: 95% !important; font-size: 2.0em; text-align: center; cursor:pointer;cursor:hand; border: 1px solid #000000 !important;}
+		.unselectedLink { border: 0px; display:inline-block; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;}
+		.directionInput { -moz-border-radius: 10px; -webkit-border-radius: 10px; margin: 0px !important; font-size: 2.0em; text-align: center; cursor:pointer;cursor:hand; border: 1px solid #000000 !important; width: 95% !important;}
 	</style>
 </head> 
 <body style="background-color: #FFFFFF"> 
@@ -172,47 +172,45 @@
 					<input type="text" name="q" id="q" value="" class="title" style="width: 100%; font-size: 3.0em; border: 1px solid #000000;"/>
 				</div>
 				<div class="span-24 last">
-					<input id="gobutton" type="submit" value="Go!" style="visibility: hidden;"/>
+					<input id="gobutton" type="submit" value="Go!" style="visibility: hidden; width: 0px; height: 0px;"/>
 				</div>
 			</form>
 			<script type="text/javascript">document.mainform.q.focus();</script>
-			<form action="." method="GET" name="directionForm">
-				<div class="span-24 last">
-					<div id="link-1" class="selectedLink" style="width: 25%;">
+		</div>
+		<div class="span-24 last" style="-moz-border-radius: 10px; -webkit-border-radius: 10px; background-color: #FFEFC6; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000000; margin-left: 5px;">
+			<div class="span-8">
+				<form action="." method="GET" name="directionForm">
+					<div id="link-1" class="selectedLink" style="margin-left: 20px; margin-top: 5px;">
 						<input type="text" name="direction" id="direction" value="Go!" class="directionInput text"/>
 					</div>
-				</div>
-				<div class="span-24 last">
-					<input id="goDirection" type="submit" value="Go!" style="visibility: hidden;"/>
-				</div>
-			</form>
-		</div>
-		<div class="span-24 last" style="-moz-border-radius: 10px; -webkit-border-radius: 10px; background-color: #FFEFC6; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000000;">
-			<div class="span-4 prepend-1">
+					<input id="goDirection" type="submit" value="Go!" style="visibility: hidden; width: 0px; height: 0px;"/>
+				</form>
+			</div>
+			<div class="span-2 prepend-1">
 				<div id="link0" class="unselectedLink">
 					<a href="." onClick="mySites[0].urlGo();return false;"><img id="mySites0img" border="0"/></a>
 					<script type="text/javascript">mySites[0].setSiteImage(0);</script>
 				</div>
 			</div>
-			<div class="span-4 prepend-1">
+			<div class="span-2 prepend-1">
 				<div id="link1" class="unselectedLink">
 					<a href="." onClick="mySites[1].urlGo();return false;"><img id="mySites1img" border="0"/></a>
 					<script type="text/javascript">mySites[1].setSiteImage(1);</script>
 				</div>
 			</div>
-			<div class="span-4 prepend-1">
+			<div class="span-2 prepend-1">
 				<div id="link2" class="unselectedLink">
 					<a href="." onClick="mySites[2].urlGo();return false;"><img id="mySites2img" border="0"/></a>
 					<script type="text/javascript">mySites[2].setSiteImage(2);</script>
 				</div>
 			</div>
-			<div class="span-4 prepend-1">
+			<div class="span-2 prepend-1">
 				<div id="link3" class="unselectedLink">
 					<a href="." onClick="mySites[3].urlGo();return false;"><img id="mySites3img" border="0"/></a>
 					<script type="text/javascript">mySites[3].setSiteImage(3);</script>
 				</div>
 			</div>
-			<div class="span-3 prepend-1 last">
+			<div class="span-2 append-1 prepend-1 last">
 				<div id="link4" class="unselectedLink">
 					<a href="." onClick="mySites[4].urlGo();return false;"><img id="mySites4img" border="0"/></a>
 					<script type="text/javascript">mySites[4].setSiteImage(4);</script>
