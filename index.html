@@ -3,6 +3,8 @@
 <head>
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript">
+		var ARROW_KEY_RIGHT = 39;
+		var ARROW_KEY_LEFT = 37;
 		var mySites = [];
 		mySites[0] = new Site("Google", "http://www.google.com/#hl=en&source=hp&q=", "google.png");
 		mySites[1] = new Site("Amazon", "http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=", "amazon.png");
@@ -35,13 +37,13 @@
 			});
 
 			$("#direction").keydown(function (e) {
-				if(e.which == 39) {
+				if(e.which == ARROW_KEY_RIGHT) { 
 					e.preventDefault();
 					if(selectedLink != mySites.length-1) {
 						selectedLink = changeSelectedLink(selectedLink, selectedLink + 1);
 					}
 				}
-				if(e.which == 37) {
+				if(e.which == ARROW_KEY_LEFT) {
 					e.preventDefault();
 					if(selectedLink != -1) {
 						selectedLink = changeSelectedLink(selectedLink, selectedLink-1);
@@ -63,7 +65,7 @@
 
 			$("#direction").keyup(function(e) {
 				var directionValue = $("#direction").attr("value");
-				if (e.which != 37 && e.which != 39) {
+				if (e.which != ARROW_KEY_LEFT && e.which != ARROW_KEY_RIGHT) {
 					for (var index = mySites.length-1; index >= 0; index--) {
 						if (directionValue.length != 0) {
 							if (mySites[index].simpleName.substring(0,directionValue.length) == directionValue) {
