@@ -66,17 +66,22 @@
 			$("#direction").keyup(function(e) {
 				var directionValue = $("#direction").attr("value");
 				if (e.which != ARROW_KEY_LEFT && e.which != ARROW_KEY_RIGHT) {
+					if (directionValue.length == 0) {
+						selectedLink = changeSelectedLink(selectedLink, -1);
+					}
 					for (var index = mySites.length-1; index >= 0; index--) {
 						if (directionValue.length != 0) {
 							if (mySites[index].simpleName.substring(0,directionValue.length) == directionValue) {
-								$("#mySites" + index + "img").attr("style", ""); 
+								$("#mySites" + index + "img").attr("style", "");
 								selectedLink = changeSelectedLink(selectedLink, index);
+								mySites[index].active = true;
 							} else {
 								$("#mySites" + index + "img").attr("style", "opacity:0.4;filter:alpha(opacity=40)");
+								mySites[index].active = false;
 							}
 						} else {
 							$("#mySites" + index + "img").attr("style", "");
-							selectedLink = changeSelectedLink(selectedLink, -1);
+							mySites[index].active = true;
 						}
 					}
 				}
@@ -87,10 +92,16 @@
 			mySelectedLink = "#link" + currentSelection;
 			$(mySelectedLink).removeClass("selectedLink");
 			$(mySelectedLink).addClass("unselectedLink");
+			if (currentSelection >= 0) {
+				mySites[currentSelection].selected = false;
+			}
 			
 			newSelectedLink = "#link" + newSelection;
 			$(newSelectedLink).removeClass("unselectedLink");
 			$(newSelectedLink).addClass("selectedLink");
+			if (newSelection >= 0) {
+				mySites[newSelection].selected = true;
+			}
 			
 			return(newSelection);
 		}
@@ -126,6 +137,10 @@
 			this.name = name;
 			this.imageFile = "images/" + imageFile;
 			this.searchURL = searchURL;
+
+			// Selection controls.
+			this.active = true;
+			this.selected = false;
 
 			// Create Identify name for site. Strips ".,?!-"
 			var lowerName = name.toLowerCase();
