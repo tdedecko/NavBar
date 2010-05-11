@@ -52,7 +52,9 @@
 			});
 
 			$("#direction").focus(function(e) {
-				$("#direction").attr("value", "");	
+				if ($("#direction").attr("value") == "Go!") {
+					$("#direction").attr("value", "");
+				}
 			});
 
 			$("#direction").blur(function(e) {
